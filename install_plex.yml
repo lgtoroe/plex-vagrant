@@ -1,0 +1,49 @@
+---
+
+# common
+- hosts: localhost
+  become: true
+  gather_facts: no
+
+# Install plex repo, apt update and install plex
+  tasks:
+
+  - name: install git
+    action: apt name=git state=installed update_cache=yes
+
+  - name: PLEX | Install apt-transport-https
+    apt:
+      name: apt-transport-https
+      state: present
+
+  - name: PLEX | Add Plex Apt repo
+    apt_repository:
+      repo: deb https://downloads.plex.tv/repo/deb/ public main
+      state: present
+
+  - name: PLEX | Repo Key
+    apt_key:
+      url: https://downloads.plex.tv/plex-keys/PlexSign.key
+      state: present
+
+  - name: PLEX | Apt install Plex
+    apt:
+      name: plexmediaserver
+      state: present
+      update_cache: yes
+
+# Restart Plex
+  post_tasks:
+
+  - name: PLEX | Autostart Plex and start service
+    service:
+      name: plexmediaserver
+      enabled: yes
+    notify: restart plex
+
+# Handler to restart plex
+  handlers:
+   - name: restart plex
+     service:
+       name: plexmediaserver
+       state: restarted
