@@ -9,7 +9,7 @@
   tasks:
 
   - name: install git
-    action: apt name=git state=installed update_cache=yes
+    action: apt name=git state=latest update_cache=yes
 
   - name: PLEX | Install apt-transport-https
     apt:
